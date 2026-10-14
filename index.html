@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Atlas of the Dark Tower</title>
+<meta name="description" content="An interactive map of Stephen King's universe with the Dark Tower at the center. Follow the threads, find your reading path, and see what Flanagan's Carrie planted.">
+<meta name="theme-color" content="#0c0708">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Atlas of the Dark Tower">
+<meta property="og:description" content="An interactive map of Stephen King's universe with the Dark Tower at the center. Follow the threads, find your reading path, and see what Flanagan's Carrie planted.">
+<meta property="og:url" content="https://jmrhodes42.github.io/dark-tower-atlas/">
+<meta property="og:image" content="https://jmrhodes42.github.io/dark-tower-atlas/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Atlas of the Dark Tower">
+<meta name="twitter:description" content="An interactive map of Stephen King's universe with the Dark Tower at the center. Follow the threads, find your reading path, and see what Flanagan's Carrie planted.">
+<meta name="twitter:image" content="https://jmrhodes42.github.io/dark-tower-atlas/og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-30 -70 60 150'%3E%3Cpath d='M-26 58 L-20 -40 L-24 -44 L-24 -54 L-16 -54 L-16 -48 L-8 -48 L-8 -58 L0 -66 L8 -58 L8 -48 L16 -48 L16 -54 L24 -54 L24 -44 L20 -40 L26 58 Z' fill='%23c8183a'/%3E%3C/svg%3E">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}*,*::before,*::after{box-sizing:border-box}body{margin:0;-webkit-text-size-adjust:100%}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Spectral:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one dark field. The Tower sits at the center of a radial map; a reading panel rides the right edge (stacks below on phones). Single deliberate dark look: the Crimson King's colors. */
+:root{
+  color-scheme: dark;
+  --void:#0c0708;      /* page ground, warm black */
+  --soot:#140b0d;      /* panel */
+  --char:#2a181c;      /* rules, borders */
+  --bone:#ece2d8;      /* text */
+  --dust:#a08f88;      /* secondary text */
+  --crimson:#c8183a;   /* canon, the King */
+  --rose:#f2667f;      /* the Rose, adaptations, focus */
+  --glow:#ff9aa9;
+  /* thread hues, kept dusky to sit inside the crimson world */
+  --t-flagg:#e8dccf;
+  --t-crimson:#e0243f;
+  --t-breakers:#f2789a;
+  --t-callahan:#d9a64f;
+  --t-turtle:#86b5a2;
+  --t-derry:#b6b56a;
+  --t-doors:#a58ad8;
+  --t-flanagan:#9fb0c6;
+  --f-display:"IM Fell English", "Iowan Old Style", Georgia, serif;
+  --f-sc:"IM Fell English SC", "IM Fell English", Georgia, serif;
+  --f-body:"Spectral", "Iowan Old Style", Georgia, serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+html,body{height:100%}
+body{background:var(--void);color:var(--bone);font-family:var(--f-body);font-size:15px;line-height:1.55;display:flex;flex-direction:column;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--rose);outline-offset:2px}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;padding-block:14px 12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--char);background:linear-gradient(180deg,#160a0d 0%,var(--void) 100%)}
+.brand{display:flex;flex-direction:column;gap:2px;margin-right:auto;min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dust)}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(24px,3.2vw,34px);line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+h1 em{color:var(--crimson);font-style:italic}
+.tabs{display:flex;gap:4px;border:1px solid var(--char);border-radius:999px;padding:3px;background:#0f0809}
+.tab{background:none;border:0;border-radius:999px;padding:7px 14px;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:var(--dust)}
+.tab[aria-selected="true"]{background:var(--crimson);color:#fff}
+.tab:hover:not([aria-selected="true"]){color:var(--bone)}
+.tools{display:flex;gap:10px;align-items:center}
+.switch{display:flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12px;color:var(--dust);background:none;border:0;padding:4px}
+.switch .knob{width:34px;height:18px;border-radius:999px;background:var(--char);position:relative;transition:background .2s}
+.switch .knob::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--dust);transition:transform .2s,background .2s}
+.switch[aria-checked="true"] .knob{background:var(--crimson)}
+.switch[aria-checked="true"] .knob::after{transform:translateX(16px);background:#fff}
+.switch[aria-checked="true"]{color:var(--bone)}
+.ghost{background:none;border:1px solid var(--char);border-radius:999px;padding:6px 12px;font-family:var(--f-mono);font-size:12px;color:var(--dust)}
+.ghost:hover{color:var(--bone);border-color:var(--dust)}
+
+/* Stage */
+.stage{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,410px)}
+.mapwrap{position:relative;min-width:0;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 50%,#1d0b10 0%,#0f0709 45%,var(--void) 75%)}
+#map{width:100%;height:100%;display:block;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+#map.zoomed{touch-action:none;cursor:grab}
+#map.dragging{cursor:grabbing}
+.zoom{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:12px;display:flex;flex-direction:column;gap:4px}
+.zoom button{width:34px;height:34px;border-radius:8px;border:1px solid var(--char);background:rgba(12,7,8,.85);font-family:var(--f-mono);font-size:16px;color:var(--bone)}
+.zoom button:hover{border-color:var(--dust)}
+.legend{position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:12px;max-width:calc(100% - 80px);display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--f-mono);font-size:11px;color:var(--dust);background:rgba(12,7,8,.78);padding:8px 10px;border-radius:8px;border:1px solid var(--char);max-width:calc(100% - 24px)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.lg-dot{width:9px;height:9px;border-radius:50%}
+.lg-line{width:18px;height:0;border-top:2px solid var(--crimson)}
+.lg-dash{width:18px;height:0;border-top:2px dashed var(--dust)}
+.lg-dia{width:8px;height:8px;transform:rotate(45deg);border:1.5px solid var(--rose)}
+
+/* Panel */
+.panel{border-left:1px solid var(--char);background:var(--soot);overflow-y:auto;min-width:0;padding-block:22px 40px;padding-left:22px;padding-right:max(22px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.panel h2{font-family:var(--f-display);font-weight:400;font-size:28px;line-height:1.1;margin:0;text-wrap:balance}
+.panel h3{font-family:var(--f-sc);font-weight:400;font-size:17px;letter-spacing:.03em;margin:0;color:var(--bone)}
+.panel p{margin:0;max-width:62ch}
+.muted{color:var(--dust)}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid var(--char);color:var(--dust)}
+.chip.canon{border-color:rgba(200,24,58,.6);color:#ff8b9c}
+.chip.echo{border-style:dashed}
+.chip.screen{border-color:rgba(242,102,127,.5);color:var(--rose)}
+.facts{display:flex;flex-direction:column;gap:14px}
+.fact{display:grid;grid-template-columns:18px minmax(0,1fr);gap:4px 12px}
+.fact .mark{grid-row:span 2;width:10px;height:10px;margin-top:7px;transform:rotate(45deg);background:var(--crimson)}
+.fact b{font-family:var(--f-sc);font-weight:400;font-size:17px}
+.fact p{color:#d7cbc1}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.btn{background:var(--crimson);border:0;border-radius:999px;padding:9px 16px;font-family:var(--f-mono);font-size:12px;letter-spacing:.05em;color:#fff}
+.btn.alt{background:none;border:1px solid var(--char);color:var(--bone)}
+.btn:hover{filter:brightness(1.12)}
+.rule{height:1px;background:var(--char);border:0;margin:0}
+.tie{border-left:2px solid var(--crimson);padding-left:12px}
+.tie.echo{border-left-style:dashed;border-left-color:var(--dust)}
+.tie .lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dust);display:block;margin-bottom:2px}
+.spoil{position:relative;border:1px solid var(--char);border-radius:10px;padding:12px 14px;background:#100809}
+.spoil .lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--rose);display:block;margin-bottom:4px}
+.spoil.locked p{filter:blur(6px);user-select:none;-webkit-user-select:none}
+.spoil.locked button{position:absolute;inset:0;background:transparent;border:0;border-radius:10px;font-family:var(--f-mono);font-size:12px;color:var(--bone);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px}
+.spoil.locked button span{background:rgba(12,7,8,.9);border:1px solid var(--char);padding:4px 10px;border-radius:999px}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.list li{min-width:0}
+.item{width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:9px 10px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;align-items:baseline}
+.item:hover{background:#1c1013}
+.item .yr{font-family:var(--f-mono);font-size:11px;color:var(--dust);font-variant-numeric:tabular-nums}
+.item .ttl{font-family:var(--f-body);font-weight:500}
+.item .note{grid-column:2 / 4;color:#cdbfb5;font-size:14px}
+.item .note.hidden{color:var(--dust);font-style:italic}
+.item .sw{width:10px;height:10px;border-radius:50%;align-self:center}
+.threads{display:flex;flex-direction:column;gap:6px}
+.thr{display:grid;grid-template-columns:14px minmax(0,1fr);gap:2px 12px;text-align:left;background:none;border:1px solid var(--char);border-radius:10px;padding:11px 12px}
+.thr:hover,.thr[aria-pressed="true"]{border-color:var(--dust);background:#1a0f12}
+.thr .sw{width:12px;height:12px;border-radius:50%;margin-top:5px;grid-row:span 2}
+.thr b{font-family:var(--f-sc);font-weight:400;font-size:16px}
+.thr small{color:var(--dust);font-size:13px}
+.origins{display:flex;flex-wrap:wrap;gap:6px}
+.origin{background:none;border:1px solid var(--char);border-radius:999px;padding:7px 12px;font-size:14px;color:var(--bone)}
+.origin[aria-pressed="true"]{background:var(--crimson);border-color:var(--crimson);color:#fff}
+.origin:hover:not([aria-pressed="true"]){border-color:var(--dust)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:30px minmax(0,1fr);gap:2px 12px;position:relative;padding-bottom:16px}
+.step::before{content:"";position:absolute;left:14px;top:30px;bottom:0;border-left:1px dashed var(--char)}
+.step:last-child::before{display:none}
+.step .n{width:30px;height:30px;border-radius:50%;border:1px solid var(--crimson);display:grid;place-items:center;font-family:var(--f-mono);font-size:12px;color:#ff8b9c;grid-row:span 2}
+.step:last-child .n{background:var(--crimson);color:#fff}
+.step .st{background:none;border:0;padding:0;text-align:left;font-weight:500;font-size:16px}
+.step .st:hover{color:var(--rose)}
+.step .st .yr{font-family:var(--f-mono);font-size:11px;color:var(--dust);margin-left:6px;font-weight:400}
+.step p{color:#d0c3b9;font-size:14px}
+.back{align-self:flex-start;background:none;border:0;padding:0;font-family:var(--f-mono);font-size:12px;color:var(--dust)}
+.back:hover{color:var(--bone)}
+.src{font-size:12px;color:var(--dust)}
+.src a{color:var(--dust)}
+
+/* Map styles */
+.ring{fill:none;stroke:#3a1c22;stroke-width:1;vector-effect:non-scaling-stroke}
+.ring.r0{stroke:#5b1e2a}
+.ringlbl{fill:#7c5f5f;font-family:var(--f-mono);letter-spacing:.18em}
+.beam{stroke:url(#beamGrad);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.web path{fill:none;stroke-width:1;vector-effect:non-scaling-stroke;opacity:.16;transition:opacity .25s}
+.web.dim path{opacity:.04}
+.hl path{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linecap:round}
+.hl path.echo{stroke-dasharray:5 5}
+.route path{fill:none;stroke:var(--rose);stroke-width:2.4;vector-effect:non-scaling-stroke;stroke-dasharray:7 6;animation:march 1.2s linear infinite}
+@keyframes march{to{stroke-dashoffset:-26}}
+.node{cursor:pointer;transition:opacity .25s}
+.node .dot{transition:r .2s}
+.node.tower .dot{fill:var(--rose);filter:url(#glow)}
+.node.canon .dot{fill:var(--crimson)}
+.node.echo .dot{fill:var(--void);stroke:var(--dust);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.node.screen .dot{fill:var(--void);stroke:var(--rose);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.node .hit{fill:transparent}
+.node .halo{fill:none;stroke:var(--rose);stroke-width:1.5;vector-effect:non-scaling-stroke;opacity:0}
+.node.sel .halo{opacity:1;animation:halo 1.8s ease-out infinite}
+@keyframes halo{0%{opacity:.9}100%{opacity:0}}
+.lbl{fill:var(--bone);font-family:var(--f-body);pointer-events:none;paint-order:stroke;stroke:var(--void);stroke-width:3px;stroke-linejoin:round;transition:opacity .25s}
+.lbl.r0{font-family:var(--f-display);fill:#ffd9df}
+.lbl.screen{fill:var(--rose);font-style:italic}
+.lbl.off{opacity:0}
+.faded .node:not(.lit){opacity:.18}
+.faded .lbl:not(.lit){opacity:0}
+.badge circle{fill:var(--crimson)}
+.badge text{fill:#fff;font-family:var(--f-mono);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.towerglyph{cursor:pointer}
+.towerglyph .body{fill:#1b0b0f;stroke:var(--crimson);stroke-width:1.4;vector-effect:non-scaling-stroke}
+.towerglyph .win{fill:var(--glow)}
+.towerglyph .rose{fill:var(--rose)}
+
+/* Intro: the map assembles itself, once. Fill mode is backwards so nothing is pinned after it ends. */
+.intro .towerglyph .body{animation:drawT 1.6s ease-out backwards}
+.intro .towerglyph .win{animation:fadein .5s ease-out backwards;animation-delay:calc(1.2s + var(--d,0s))}
+.intro .towerglyph .rose{animation:fadein .8s ease-out 1.5s backwards}
+.intro .beam{animation:drawB 1.4s ease-out backwards;animation-delay:calc(1.4s + var(--d,0s))}
+.intro .ring{animation:fadein 1s ease-out backwards;animation-delay:var(--d,2s)}
+.intro .node,.intro .lbl:not(.off){animation:ignite .7s ease-out backwards;animation-delay:var(--d,2.4s)}
+.intro .web{animation:fadein 1.2s ease-out 4.2s backwards}
+.intro .ringlbl{animation:fadein 1s ease-out 3.6s backwards}
+@keyframes drawT{from{stroke-dasharray:900;stroke-dashoffset:900}to{stroke-dasharray:900;stroke-dashoffset:0}}
+@keyframes drawB{from{stroke-dasharray:2400;stroke-dashoffset:2400}to{stroke-dasharray:2400;stroke-dashoffset:0}}
+@keyframes fadein{from{opacity:0}}
+@keyframes ignite{0%{opacity:0}60%{opacity:1;filter:brightness(2)}100%{opacity:1}}
+.top.introtext h1{animation:titlein 1.8s ease-out backwards}
+@keyframes titlein{from{opacity:0;letter-spacing:.2em}}
+@media (prefers-reduced-motion: reduce){
+  .intro *,.top.introtext h1,.route path,.node.sel .halo{animation:none!important}
+}
+
+/* Phones and narrow windows: map on top, panel below, page scrolls */
+@media (max-width: 860px){
+  body{overflow:auto;display:block;height:auto}
+  .stage{display:flex;flex-direction:column}
+  .mapwrap{height:min(100vw,600px);flex:none}
+  .panel{border-left:0;border-top:1px solid var(--char);overflow:visible;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .legend{position:static;margin:8px 12px 0;border:0;background:none;padding:0}
+  .mapwrap{display:flex;flex-direction:column}
+  #map{flex:1;min-height:0}
+  .tools{width:100%;justify-content:space-between}
+  .tabs{order:3}
+}
+@media (max-width: 520px){
+  .tab{padding:7px 10px}
+  .legend{font-size:10px}
+}
+</style>
+
+</head>
+<body>
+<header class="top introtext" id="top">
+  <div class="brand">
+    <span class="eyebrow">Stephen King · 1970 to 2026</span>
+    <h1>Atlas of the <em>Dark Tower</em></h1>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Ways in">
+    <button class="tab" role="tab" id="tab-explore" data-mode="explore" aria-selected="true">Explore</button>
+    <button class="tab" role="tab" id="tab-threads" data-mode="threads" aria-selected="false">Threads</button>
+    <button class="tab" role="tab" id="tab-path" data-mode="path" aria-selected="false">Your path</button>
+  </div>
+  <div class="tools">
+    <button class="switch" id="spoilers" role="switch" aria-checked="false"><span class="knob" aria-hidden="true"></span>Spoilers</button>
+    <button class="ghost" id="replay">Replay intro</button>
+  </div>
+</header>
+
+<main class="stage">
+  <section class="mapwrap" aria-label="Map of the Stephen King universe around the Dark Tower">
+    <svg id="map" xmlns="http://www.w3.org/2000/svg" class="intro" role="img" aria-label="Radial map: the Dark Tower at center, Tower books on the inner ring, canon crossovers on the middle ring, thematic echoes on the outer ring.">
+      <defs>
+        <radialGradient id="beamGrad" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="640">
+          <stop offset="0" stop-color="#ff7d92" stop-opacity=".75"/>
+          <stop offset=".45" stop-color="#c8183a" stop-opacity=".28"/>
+          <stop offset="1" stop-color="#c8183a" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="coreGrad" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="#c8183a" stop-opacity=".35"/>
+          <stop offset="1" stop-color="#c8183a" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <g id="vp"></g>
+    </svg>
+    <div class="zoom">
+      <button id="zin" aria-label="Zoom in">+</button>
+      <button id="zout" aria-label="Zoom out">−</button>
+      <button id="zreset" aria-label="Reset view">◎</button>
+    </div>
+    <div class="legend" aria-label="Legend">
+      <span><i class="lg-dot" style="background:var(--rose)"></i>Tower book</span>
+      <span><i class="lg-dot" style="background:var(--crimson)"></i>Canon crossover</span>
+      <span><i class="lg-dot" style="border:1.5px solid var(--dust)"></i>Echo</span>
+      <span><i class="lg-dia"></i>Screen</span>
+      <span><i class="lg-line"></i>Confirmed link</span>
+      <span><i class="lg-dash"></i>Thematic link</span>
+    </div>
+  </section>
+  <aside class="panel" id="panel" aria-live="polite"></aside>
+</main>
+
+<script>
+(() => {
+/* ---------- DATA ---------- */
+// ring 0 = Tower cycle, 1 = canon crossover, 2 = echo (thematic, not confirmed by King). kind: book | screen
+const WORKS = [
+  // The Tower cycle, publication order clockwise from the top
+  {id:"gunslinger", t:"The Gunslinger", yr:1982, ring:0, a:0, kind:"book",
+   b:"Roland Deschain, the last gunslinger, follows the man in black across a desert in a world that has moved on. Short and strange, and the door to everything else.",
+   tie:"King wrote its first line in 1970, at 22, four years before Carrie. It ran as magazine stories from 1978 and became a book in 1982. He revised it in 2003 to fit the ending.",
+   sp:"Roland lets Jake fall so he can keep chasing. The man in black reads Roland's future in tarot cards and points him at the Tower."},
+  {id:"drawing", t:"The Drawing of the Three", yr:1987, ring:0, a:45, kind:"book",
+   b:"Doors stand alone on a beach. Each one opens into our New York, in a different year, and Roland draws his companions through.",
+   tie:"The first time Roland's world and ours touch. Every later crossover follows this rule.",
+   sp:"Eddie Dean, a heroin addict in 1987, and Odetta Holmes, whose second self is Detta Walker. The third door opens on Jack Mort, the man who pushed Jake."},
+  {id:"wastelands", t:"The Waste Lands", yr:1991, ring:0, a:90, kind:"book",
+   b:"The ka-tet finds the Path of the Beam, meets the giant bear Shardik, and learns about a rose growing in a Manhattan vacant lot. Ends on a train that loves riddles.",
+   tie:"The Beam they follow runs from the Bear to the Turtle. The Turtle is the one from IT.",
+   sp:"Jake is pulled back through a door from 1977 New York. The rose in the lot is the Tower's twin on our side of things."},
+  {id:"wizard", t:"Wizard and Glass", yr:1997, ring:0, a:135, kind:"book",
+   b:"Mostly a long flashback: young Roland in Mejis, his first love, and a pink seeing-ball called Maerlyn's Grapefruit. The frame story crosses into another King world.",
+   tie:"The ka-tet walks through a Kansas emptied by the superflu. That's the world of The Stand.",
+   sp:"Susan Delgado burns. The 'wizard' in the green palace is Flagg, and Roland knows him as Marten Broadcloak."},
+  {id:"wolves", t:"Wolves of the Calla", yr:2003, ring:0, a:180, kind:"book",
+   b:"Every generation, raiders take one of each pair of twins from a farming town. The town hires gunslingers. A priest from Maine is living there.",
+   tie:"Father Callahan from 'Salem's Lot. Read that book first.",
+   sp:"The Wolves are machines. The stolen children's minds feed the Breakers at Thunderclap. Callahan has been carrying Black Thirteen, the worst ball of Maerlyn's Rainbow."},
+  {id:"susannah", t:"Song of Susannah", yr:2004, ring:0, a:225, kind:"book",
+   b:"Something called Mia takes over Susannah's body to give birth in 1999 New York. Roland and Eddie cross into 1977 Maine to find the man behind their story.",
+   tie:"The book where the author enters his own universe.",
+   sp:"Stephen King is a character. Roland and Eddie meet him in Bridgton, Maine, and realize he is the Tower's scribe. If he stops writing, they fail."},
+  {id:"darktower", t:"The Dark Tower", yr:2004, ring:0, a:270, kind:"book",
+   b:"The last push: the Breakers at Devar-Toi, the Dixie Pig, the Crimson King, and the Tower itself.",
+   tie:"Characters from Hearts in Atlantis, Insomnia and Everything's Eventual come together here.",
+   sp:"Ted Brautigan, Dinky Earnshaw and Patrick Danville all arrive from other books. Eddie and Jake die. Mordred kills Walter. Roland climbs the Tower and wakes in the desert again, this time carrying the Horn of Eld."},
+  {id:"keyhole", t:"The Wind Through the Keyhole", yr:2012, ring:0, a:315, kind:"book",
+   b:"A story inside a story inside a story, set between books four and five. Safe to read any time after Wizard and Glass.",
+   tie:"King's return to Mid-World eight years after the ending.",
+   sp:"The Covenant Man in Tim Ross's tale is strongly implied to be Walter, the man in black."},
+
+  // Canon crossovers
+  {id:"stand", t:"The Stand", yr:1978, ring:1, a:18, kind:"book",
+   b:"A superflu kills most of humanity. The survivors drift toward Mother Abagail in Boulder or Randall Flagg, the walking dude, in Las Vegas.",
+   tie:"Flagg is the man in black. Wizard and Glass walks through this world.",
+   sp:"Flagg survives the end of the uncut edition and wakes on a beach with a new name. In the Tower books he is Walter o'Dim."},
+  {id:"eyes", t:"The Eyes of the Dragon", yr:1987, ring:1, a:42, kind:"book",
+   b:"A fairy tale King wrote for his daughter. Flagg is the court magician of Delain, patient and poisonous.",
+   tie:"Flagg again, in a kingdom near Mid-World.",
+   sp:"Thomas and Dennis, who chase Flagg out of Delain, are mentioned by name in Wizard and Glass."},
+  {id:"talisman", t:"The Talisman", yr:1984, ring:1, a:75, kind:"book", note:"with Peter Straub",
+   b:"Twelve-year-old Jack Sawyer 'flips' into the Territories, a parallel world, to find the thing that can save his dying mother.",
+   tie:"The Territories sit alongside Mid-World. Black House makes it explicit.",
+   sp:"Speedy Parker, Jack's guide, turns out to be far more than an old blues man. Black House names him Parkus."},
+  {id:"blackhouse", t:"Black House", yr:2001, ring:1, a:100, kind:"book", note:"with Peter Straub",
+   b:"Jack Sawyer, now a retired LAPD detective, hunts a child killer in small-town Wisconsin.",
+   tie:"The most openly Tower-bound book outside the series. The Crimson King, the Breakers and the Beams are all named.",
+   sp:"The killer is collecting Tyler Marshall for the Crimson King because he could be a Breaker."},
+  {id:"hearts", t:"Hearts in Atlantis", yr:1999, ring:1, a:128, kind:"book",
+   b:"Five linked stories from 1960 to 1999. The first, 'Low Men in Yellow Coats', follows a boy and the old man renting upstairs.",
+   tie:"Read it before the final Tower book. Its first story feeds the ending.",
+   sp:"Ted Brautigan is a Breaker on the run from the Crimson King's Low Men. They take him back. He turns up at Devar-Toi in The Dark Tower."},
+  {id:"eventual", t:"Everything's Eventual", yr:2002, ring:1, a:150, kind:"book",
+   b:"A story collection with two Tower pieces: the title story, about a young man who can kill with symbols, and 'The Little Sisters of Eluria', a young Roland adventure.",
+   tie:"Dinky Earnshaw from the title story reappears in the last book.",
+   sp:"Dinky turns up as a Breaker at Devar-Toi in The Dark Tower."},
+  {id:"insomnia", t:"Insomnia", yr:1994, ring:1, a:178, kind:"book",
+   b:"Ralph Roberts, an old widower in Derry, stops sleeping. He starts seeing auras, and three little bald doctors who decide when people die.",
+   tie:"The Crimson King shows his face here, ten years before the final book.",
+   sp:"The plot turns on saving a boy named Patrick Danville. In The Dark Tower, grown-up Patrick's drawing is what stops the Crimson King."},
+  {id:"it", t:"IT", yr:1986, ring:1, a:208, kind:"book",
+   b:"Seven kids in Derry, Maine, against the thing in the sewers, in 1958 and again in 1985.",
+   tie:"The Turtle who helps the kids is Maturin, guardian of one end of the Beam in the Tower books.",
+   sp:"Bill reaches the Turtle in the Ritual of Chüd. The Turtle is dying, or already dead, by the time the adults return."},
+  {id:"salem", t:"'Salem's Lot", yr:1975, ring:1, a:248, kind:"book",
+   b:"A vampire takes a small Maine town house by house. Father Callahan, a priest who drinks, decides to stand against it.",
+   tie:"Read before Wolves of the Calla. Callahan's story picks up there.",
+   sp:"Callahan's faith fails in front of Barlow. Barlow forces him to drink his blood, and Callahan leaves town on a bus."},
+  {id:"ur", t:"Ur", yr:2009, ring:1, a:300, kind:"book", note:"novella, later in The Bazaar of Bad Dreams",
+   b:"A college teacher's pink Kindle can read books from other versions of the world, and newspapers from a few days ahead.",
+   tie:"Built on Tower ideas: other levels of the Tower, and enforcers who read like the Low Men.",
+   sp:"Two agents of the Paradox Police show up to make sure he doesn't change too much."},
+
+  // Echoes
+  {id:"carrie", t:"Carrie", yr:1974, ring:2, a:178, kind:"book",
+   b:"A bullied girl with telekinesis, a bucket of pig's blood, and a prom. King's first published novel, told partly through reports and interviews after the fact.",
+   tie:"The novel has no Tower link. Flanagan's 2026 series added one.", echo:true,
+   sp:"Carrie destroys the prom and much of Chamberlain, then dies in Sue Snell's arms, in her mind."},
+  {id:"shining", t:"The Shining", yr:1977, ring:2, a:106, kind:"book",
+   b:"Danny Torrance has the shine. His father takes the winter caretaker job at the Overlook Hotel.",
+   tie:"The shine became King's word for psychic gifts. The Breakers are that kind of mind, put to work.", echo:true,
+   sp:"The Overlook's boiler explodes with Jack inside. Hallorann gets Danny and Wendy out."},
+  {id:"docsleep", t:"Doctor Sleep", yr:2013, ring:2, a:122, kind:"book",
+   b:"Grown-up Danny Torrance protects Abra Stone from the True Knot, travelers who feed on children who shine.",
+   tie:"People who hunt gifted children for what they can take from them. The Tower's Breakers on a smaller scale.", echo:true,
+   sp:"Danny and Abra finish the True Knot on the old Overlook site."},
+  {id:"firestarter", t:"Firestarter", yr:1980, ring:2, a:145, kind:"book",
+   b:"Charlie McGee can start fires with her mind. A government agency called The Shop wants her.",
+   tie:"A government version of the same hunt.", echo:true,
+   sp:"Charlie burns the Shop compound down and takes her story to Rolling Stone."},
+  {id:"institute", t:"The Institute", yr:2019, ring:2, a:160, kind:"book",
+   b:"Kids with small psychic gifts are taken to a facility in the Maine woods and pushed far past their limits.",
+   tie:"Many fans read it as a Breaker story without the name. King hasn't confirmed it.", echo:true,
+   sp:"Linked together, the children are used as a long-range weapon. Luke Ellis gets out and brings the place down."},
+  {id:"dreamcatcher", t:"Dreamcatcher", yr:2001, ring:2, a:205, kind:"book",
+   b:"Four friends who grew up in Derry, the boy they protected as kids, and an alien infection in the Maine woods.",
+   tie:"Derry again. The town keeps producing this kind of thing.", echo:true,
+   sp:"Duddits, dying, is the key to stopping Mr. Gray."},
+  {id:"eleven", t:"11/22/63", yr:2011, ring:2, a:222, kind:"book",
+   b:"A teacher goes back through a time portal to stop the Kennedy assassination. His road runs through Derry in 1958.",
+   tie:"Two kids from IT appear in person.", echo:false,
+   sp:"Jake Epping meets Beverly Marsh and Richie Tozier dancing in 1958, weeks after the Losers' first fight with It."},
+  {id:"buick", t:"From a Buick 8", yr:2002, ring:2, a:290, kind:"book",
+   b:"Pennsylvania state troopers keep a car that isn't really a car in a shed behind the barracks. Things come through it.",
+   tie:"Fans read the Buick as one of the Low Men's cars. Not confirmed.", echo:true,
+   sp:"The Buick is a door to somewhere else, and it's going dormant. The man who left it wore a black coat."},
+  {id:"mist", t:"The Mist", yr:1980, ring:2, a:312, kind:"book",
+   b:"A Maine supermarket, a fog full of monsters, and a military project called Arrowhead.",
+   tie:"It reads like a thinny or todash darkness, the Tower's terms for places where worlds wear through.", echo:true,
+   sp:"Arrowhead likely tore a hole into another dimension. The novella ends with the question still open."},
+  {id:"fairytale", t:"Fairy Tale", yr:2022, ring:2, a:335, kind:"book",
+   b:"Seventeen-year-old Charlie Reade climbs down a well behind a neighbor's shed into Empis, a dark fairy-tale world.",
+   tie:"No confirmed Tower link. Same idea of doors between worlds.", echo:true,
+   sp:"Charlie restores Empis and drives Gogmagog back into the dark."},
+
+  // Screen
+  {id:"dt2017", t:"The Dark Tower (2017)", yr:2017, kind:"screen", parent:"gunslinger", off:-9,
+   b:"Idris Elba as Roland, Matthew McConaughey as Walter. A loose sequel to the books, compressed into 95 minutes.",
+   tie:"Built as a continuation, with Roland carrying the Horn of Eld."},
+  {id:"dtflan", t:"The Dark Tower (Flanagan)", yr:2026, kind:"screen", parent:"gunslinger", off:9,
+   b:"In development. Mike Flanagan and Trevor Macy have held the rights since 2022. Flanagan's plan has been five seasons plus two films.",
+   tie:"Season one is scripted and King reportedly liked it. As of October 2026 there is no series order. King has said he isn't writing for it."},
+  {id:"carrie76", t:"Carrie (1976)", yr:1976, kind:"screen", parent:"carrie", off:-5,
+   b:"Brian De Palma, Sissy Spacek, Piper Laurie. The version everyone remembers."},
+  {id:"carrie26", t:"Carrie (2026)", yr:2026, kind:"screen", parent:"carrie", off:5,
+   b:"Mike Flanagan's eight-episode series for Prime Video, all released October 7, 2026, with Summer H. Howell as Carrie. Amazon offered him Carrie when the Tower stalled.",
+   tie:"Flanagan confirmed the tie. Ralph White works a LaMerk Industries construction job, and Chris and Billy get the blood from the Sombra hog farm. In the Tower books, LaMerk and Sombra are fronts for the Crimson King, and the King hunts gifted minds."},
+  {id:"shining80", t:"The Shining (1980)", yr:1980, kind:"screen", parent:"shining", off:-7,
+   b:"Stanley Kubrick. A landmark that King has never liked."},
+  {id:"docsleep19", t:"Doctor Sleep (2019)", yr:2019, kind:"screen", parent:"docsleep", off:0,
+   b:"Mike Flanagan. It reconciles Kubrick's film with King's novel, and King approved."},
+  {id:"it1719", t:"IT Chapters One and Two", yr:2017, kind:"screen", parent:"it", off:-6,
+   b:"Andy Muschietti's two films, 2017 and 2019. The Turtle is reduced to Easter eggs."},
+  {id:"derry25", t:"IT: Welcome to Derry", yr:2025, kind:"screen", parent:"it", off:6,
+   b:"HBO prequel series set in 1962, with a young Dick Hallorann from The Shining.",
+   tie:"The season one finale uses Maturin root and reaches toward todash space."},
+  {id:"stand20", t:"The Stand (1994, 2020)", yr:1994, kind:"screen", parent:"stand", off:0,
+   b:"Two miniseries. Jamey Sheridan played Flagg in 1994, Alexander Skarsgård in 2020. King wrote a new final episode for the 2020 version."},
+  {id:"salem24", t:"'Salem's Lot (1979, 2024)", yr:1979, kind:"screen", parent:"salem", off:0,
+   b:"Tobe Hooper's 1979 miniseries and Gary Dauberman's 2024 film."},
+  {id:"hearts01", t:"Hearts in Atlantis (2001)", yr:2001, kind:"screen", parent:"hearts", off:0,
+   b:"Anthony Hopkins as Ted Brautigan. Most of the Tower material was cut."},
+  {id:"institute25", t:"The Institute (2025)", yr:2025, kind:"screen", parent:"institute", off:0,
+   b:"An eight-episode series with Ben Barnes and Mary-Louise Parker."},
+  {id:"mist07", t:"The Mist (2007)", yr:2007, kind:"screen", parent:"mist", off:0,
+   b:"Frank Darabont. A harsher ending than the novella, and King praised it."},
+];
+
+const THREADS = [
+  {id:"flagg", name:"The Man in Black", color:"var(--t-flagg)",
+   d:"A dark man in a hooded robe keeps turning up, under different names, in different worlds. Always a step ahead, always grinning.",
+   ds:"Randall Flagg, Walter o'Dim, Marten Broadcloak and the Covenant Man are the same man.",
+   m:[["stand","Randall Flagg, the walking dude, gathers the survivors who choose him."],
+      ["gunslinger","The man in black flees across the desert, and Roland follows."],
+      ["eyes","Flagg as Delain's court magician, poisoning a kingdom slowly."],
+      ["wizard","The 'wizard' of the green palace is Flagg. Roland knows him as Marten.",1],
+      ["darktower","His end comes from Mordred, not Roland.",1],
+      ["keyhole","The Covenant Man of Tim's tale is strongly implied to be him.",1],
+      ["stand20","Jamey Sheridan in 1994, Alexander Skarsgård in 2020."],
+      ["dt2017","Matthew McConaughey plays Walter."]]},
+  {id:"crimson", name:"The Crimson King", color:"var(--t-crimson)",
+   d:"The power at the far end of the story that wants the Tower to fall. You mostly meet him through the people and companies working for him.",
+   m:[["insomnia","He appears in person, in Derry, hunting a boy.",1],
+      ["hearts","His Low Men in yellow coats hunt Ted Brautigan through 1960 Connecticut."],
+      ["blackhouse","The killer is collecting a gifted boy for him.",1],
+      ["eventual","Dinky Earnshaw is hired by the Trans Corporation and ends up in his service.",1],
+      ["wolves","The Wolves of Thunderclap serve him.",1],
+      ["susannah","The Dixie Pig in Manhattan is a nest of his vampires and can-toi."],
+      ["darktower","Roland finally faces him at the Tower.",1],
+      ["carrie26","LaMerk Industries and the Sombra hog farm are his corporate fronts in the books."]]},
+  {id:"breakers", name:"Talents and Breakers", color:"var(--t-breakers)",
+   d:"King keeps returning to children with power and the people who want to use them. In the Tower books the hunt has a purpose: Breakers are psychics forced to wear down the Beams.",
+   m:[["carrie","Telekinesis, set off by cruelty. King's first gifted kid.",0,1],
+      ["shining","Danny's shine, and Hallorann's. The word sticks for the rest of King's work.",0,1],
+      ["firestarter","The Shop hunts a girl for her power.",0,1],
+      ["hearts","Ted Brautigan, an old man with a gift, is hiding from someone."],
+      ["blackhouse","Tyler Marshall is taken because he could be a Breaker.",1],
+      ["eventual","Dinky Earnshaw's gift gets him hired."],
+      ["darktower","Devar-Toi: the Breakers at work, and the ka-tet comes for them.",1],
+      ["docsleep","The True Knot feed on children who shine.",0,1],
+      ["institute","Kidnapped kids, linked together as a weapon.",0,1],
+      ["carrie26","Flanagan ties Carrie's world to the companies that hunt gifts in the Tower books."]]},
+  {id:"callahan", name:"Father Callahan", color:"var(--t-callahan)",
+   d:"A whiskey priest from a small Maine town who fails one test, and the very long road he walks afterward.",
+   m:[["salem","Father Callahan faces the vampire, and it goes badly."],
+      ["wolves","He's living in the Calla, with a long story to tell."],
+      ["susannah","He goes through the door to 1999 New York with Jake.",1],
+      ["darktower","His last stand is at the Dixie Pig.",1]]},
+  {id:"turtle", name:"The Turtle and the Beam", color:"var(--t-turtle)",
+   d:"A huge, ancient turtle helps the kids in IT. In the Tower books he is Maturin, guardian at one end of the Beam the ka-tet follows.",
+   m:[["it","The Turtle, as old as the universe, helps Bill against It."],
+      ["wastelands","The ka-tet finds the Bear end of the Beam and follows it toward the Turtle."],
+      ["susannah","A small scrimshaw turtle, the sköldpadda, sways anyone who looks at it."],
+      ["it1719","Turtles hide in the background as Easter eggs."],
+      ["derry25","Maturin root gives the kids a way into It's realm."]]},
+  {id:"derry", name:"Derry, Maine", color:"var(--t-derry)",
+   d:"King's most haunted town. Something underneath it bends everyone who lives there.",
+   m:[["it","Home ground, in 1958 and 1985."],
+      ["insomnia","Ralph Roberts' Derry, a few years after It, with older forces at work."],
+      ["dreamcatcher","Four Derry boys, grown up, and Duddits."],
+      ["eleven","Jake Epping spends weeks in 1958 Derry and meets two kids from IT.",1],
+      ["it1719","Derry on screen, 1989 and 2016."],
+      ["derry25","1962 Derry, with a young Dick Hallorann."]]},
+  {id:"doors", name:"Doors and Thinnies", color:"var(--t-doors)",
+   d:"Thin places where one world wears through to another: doors, thinnies, todash. The Tower books made them a system.",
+   m:[["mist","The Arrowhead Project tears something open.",0,1],
+      ["talisman","Flipping into the Territories."],
+      ["drawing","Three doors on a beach, each opening into New York."],
+      ["blackhouse","The Territories, now tied to the Beams.",1],
+      ["buick","A car that works like a door.",0,1],
+      ["wolves","The Doorway Cave."],
+      ["susannah","Unfound doors between Maine, New York and Mid-World."],
+      ["ur","A Kindle that reads into other worlds."],
+      ["fairytale","Down a well into Empis.",0,1]]},
+  {id:"flanagan", name:"Flanagan's King", color:"var(--t-flanagan)",
+   d:"Mike Flanagan has adapted King more faithfully than anyone working now. Outside this map: Gerald's Game (2017) and The Life of Chuck (2024). The Tower is the one he wants most.",
+   m:[["docsleep19","Bridged Kubrick's film and King's novel. King signed off."],
+      ["carrie26","Amazon offered Carrie when the Tower stalled. He planted the Tower in it anyway."],
+      ["dtflan","Rights since 2022. Season one scripted. No series order as of October 2026."]]},
+];
+
+const PATHS = [
+  {id:"carrie", label:"I just watched Carrie (2026)",
+   s:[["carrie","Read the 1974 novel. It's short, told partly through reports, and it shows you what Flanagan changed."],
+      ["firestarter","Same subject, bigger machine: a girl with power and the agency hunting her."],
+      ["hearts","'Low Men in Yellow Coats' is where the hunt for gifted minds gets a name and a master."],
+      ["gunslinger","Now the Tower itself. It's short and strange. Finish it."],
+      ["tower","Keep going through all seven. Read The Wind Through the Keyhole after book four."]]},
+  {id:"it", label:"IT is my King book",
+   s:[["it","You know Derry and the Turtle already."],
+      ["insomnia","Back to Derry, and the first time the Crimson King shows his face."],
+      ["gunslinger","Start the Tower."],
+      ["wastelands","Book three. The Beam the ka-tet follows runs toward your Turtle."],
+      ["tower","Finish the cycle."]]},
+  {id:"stand", label:"The Stand",
+   s:[["stand","You've met Flagg."],
+      ["eyes","Flagg again, as a court magician in a fairy tale."],
+      ["gunslinger","Start the Tower. The man in black should feel familiar."],
+      ["wizard","Book four. The ka-tet walks into the world of The Stand."],
+      ["tower","Finish the cycle."]]},
+  {id:"shining", label:"The Shining or Doctor Sleep",
+   s:[["shining","Where the shine starts."],
+      ["docsleep","Danny grown up, and people who feed on children who shine."],
+      ["hearts","An old man with a gift, on the run. The Tower's version of the same idea."],
+      ["gunslinger","Start the Tower."],
+      ["tower","Finish the cycle. The Breakers at the end will feel close to home."]]},
+  {id:"salem", label:"'Salem's Lot",
+   s:[["salem","You know Father Callahan."],
+      ["gunslinger","Start the Tower, then read books two through four."],
+      ["wolves","Book five. Callahan walks back in, years later and very far from Maine."],
+      ["tower","Finish the cycle with him."]]},
+  {id:"talisman", label:"The Talisman or Black House",
+   s:[["talisman","The Territories."],
+      ["blackhouse","Where the Territories get tied to the Beams and the Crimson King."],
+      ["hearts","The Low Men, and the old man they want."],
+      ["gunslinger","Start the Tower."],
+      ["tower","Finish the cycle."]]},
+  {id:"fresh", label:"I haven't read any King yet",
+   s:[["gunslinger","Start here. It's the shortest, and the 2003 revision fits the rest of the series better."],
+      ["drawing","Where most readers get hooked. Then read The Waste Lands and Wizard and Glass."],
+      ["salem","Before book five, read 'Salem's Lot. Wolves of the Calla picks up its priest."],
+      ["hearts","Before book seven, read Hearts in Atlantis. Its first story feeds the ending."],
+      ["tower","Finish with books five through seven."]]},
+  {id:"screen", label:"I only watch, I don't read",
+   s:[["carrie26","You've done this one."],
+      ["docsleep19","Flanagan's other King film, and the best on-screen version of the shine."],
+      ["it1719","Derry, and a few turtles if you look."],
+      ["stand20","Flagg on screen."],
+      ["tower","No screen version does the Tower justice yet. The 2017 film squeezes it into 95 minutes. Try the audiobooks, or wait for Flanagan."]]},
+];
+
+const TOWER = {id:"tower", t:"The Dark Tower", kind:"tower"};
+
+/* ---------- GEOMETRY ---------- */
+const R = [150, 310, 440];
+const RS = [215, 368, 492];  // screen satellites per parent ring
+const byId = {};
+WORKS.forEach(w => byId[w.id] = w);
+const pol = (r, deg) => { const a = deg*Math.PI/180; return [r*Math.sin(a), -r*Math.cos(a)]; };
+WORKS.forEach(w => {
+  if (w.kind === "screen") {
+    const p = byId[w.parent]; w.ring = p.ring; w.a = p.a + (w.off||0);
+    [w.x, w.y] = pol(RS[p.ring], w.a);
+  } else [w.x, w.y] = pol(R[w.ring], w.a);
+});
+TOWER.x = 0; TOWER.y = -20; byId.tower = TOWER;
+
+const threadsOf = id => THREADS.filter(t => t.m.some(m => m[0] === id));
+
+/* ---------- STATE ---------- */
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+};
+const S = { mode:"explore", sel:null, thread:null, path:null, spoil: store.get("tower.spoil")==="1", revealed:new Set(), hover:null };
+
+/* ---------- SVG BUILD ---------- */
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("map"), vp = document.getElementById("vp");
+const el = (tag, attrs={}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const BASE = {x:-660, y:-590, w:1320, h:1180};
+let vb = {...BASE};
+
+const gBeams = el("g",{},vp), gRings = el("g",{},vp), gWeb = el("g",{class:"web"},vp), gHl = el("g",{class:"hl"},vp),
+      gRoute = el("g",{class:"route"},vp), gNodes = el("g",{},vp), gTower = el("g",{class:"towerglyph",tabindex:"0",role:"button","aria-label":"The Dark Tower"},vp),
+      gLabels = el("g",{},vp), gBadges = el("g",{class:"badge"},vp);
+
+el("circle",{cx:0,cy:0,r:260,fill:"url(#coreGrad)"},gBeams);
+for (let i=0;i<12;i++){ const [x,y]=pol(640,i*30+15); el("line",{class:"beam",x1:0,y1:0,x2:x,y2:y,style:`--d:${(i%6)*0.08}s`},gBeams); }
+
+const ringLbls = [null,"CANON CROSSOVERS","ECHOES · THEMATIC, NOT CONFIRMED"];
+const ringArcs = [null,[312,352],[338,36]];
+R.forEach((r,i) => {
+  el("circle",{class:"ring"+(i===0?" r0":""),cx:0,cy:0,r,style:`--d:${1.9+i*0.3}s`},gRings);
+  if (!ringLbls[i]) return;
+  const [a0,a1] = ringArcs[i], rr = r+12; const [x0,y0]=pol(rr,a0), [x1,y1]=pol(rr,a1);
+  el("path",{id:"rp"+i,d:`M${x0} ${y0} A${rr} ${rr} 0 0 1 ${x1} ${y1}`,fill:"none"},gRings);
+  const tx = el("text",{class:"ringlbl","font-size":13},gRings); const tp = el("textPath",{href:"#rp"+i},tx); tp.textContent = ringLbls[i];
+});
+
+// Tower glyph: a tapering spire, lit windows spiralling up, a rose at its foot
+(() => {
+  const g = gTower;
+  el("path",{class:"body",d:"M-26 58 L-20 -40 L-24 -44 L-24 -54 L-16 -54 L-16 -48 L-8 -48 L-8 -58 L0 -66 L8 -58 L8 -48 L16 -48 L16 -54 L24 -54 L24 -44 L20 -40 L26 58 Z"},g);
+  const wins = [[-12,44],[6,32],[-4,18],[10,6],[-10,-6],[4,-18],[-6,-30],[0,-42]];
+  wins.forEach(([x,y],i)=> el("rect",{class:"win",x:x-2,y:y-3.5,width:4,height:7,rx:1,style:`--d:${i*0.12}s`},g));
+  const rose = el("g",{transform:"translate(0 70)"},g);
+  for (let i=0;i<5;i++){ const a=i*72; el("ellipse",{class:"rose",cx:0,cy:-4,rx:3.2,ry:5,transform:`rotate(${a})`,opacity:.85},rose); }
+  el("circle",{cx:0,cy:0,r:2.6,fill:"#ffd2da"},rose);
+  el("circle",{class:"hit",cx:0,cy:0,r:70,fill:"transparent"},g);
+})();
+
+// Ambient web: every thread drawn faintly so the structure reads at rest
+const curve = (a,b,pull=0.5) => {
+  const mx=(a.x+b.x)/2, my=(a.y+b.y)/2; const cx=mx*pull, cy=my*pull;
+  return `M${a.x.toFixed(1)} ${a.y.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+};
+THREADS.forEach(t => {
+  for (let i=0;i<t.m.length-1;i++){
+    const a=byId[t.m[i][0]], b=byId[t.m[i+1][0]];
+    el("path",{d:curve(a,b),stroke:t.color},gWeb);
+  }
+});
+
+// Nodes and labels
+const nodeEls = {}, labelEls = {};
+const order = [...WORKS].sort((p,q)=> (p.ring-q.ring) || (p.kind==="screen") - (q.kind==="screen") || p.yr-q.yr);
+order.forEach((w,i) => {
+  const cls = w.kind==="screen" ? "screen" : w.ring===0 ? "tower" : w.echo ? "echo" : "canon";
+  const delay = w.ring===0 ? 2.2 + (WORKS.indexOf(w))*0.14 : w.kind==="screen" ? 3.9 + Math.random()*0.4 : 3.1 + w.ring*0.35 + Math.random()*0.3;
+  const g = el("g",{class:`node ${cls}`,transform:`translate(${w.x.toFixed(1)} ${w.y.toFixed(1)})`,tabindex:"0",role:"button","aria-label":`${w.t}, ${w.yr}`,style:`--d:${delay.toFixed(2)}s`},gNodes);
+  el("circle",{class:"halo",r:10},g);
+  if (w.kind==="screen") el("rect",{class:"dot",x:-4,y:-4,width:8,height:8,transform:"rotate(45)"},g);
+  else el("circle",{class:"dot",r:6},g);
+  el("circle",{class:"hit",r:14},g);
+  g.dataset.id = w.id; nodeEls[w.id] = g;
+  const lbl = el("text",{class:`lbl ${w.ring===0&&w.kind!=="screen"?"r0":""} ${w.kind==="screen"?"screen":""}`,style:`--d:${(delay+0.15).toFixed(2)}s`},gLabels);
+  lbl.textContent = w.t; labelEls[w.id] = lbl;
+});
+
+/* ---------- SCALE-AWARE SIZING ---------- */
+let ppu = 1; // screen pixels per map unit
+function measure(){
+  const r = svg.getBoundingClientRect();
+  ppu = Math.min(r.width / vb.w, r.height / vb.h) || 1;
+}
+function applyVB(){
+  svg.setAttribute("viewBox",`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+  measure(); resize();
+  svg.classList.toggle("zoomed", vb.w < BASE.w - 1);
+}
+function resize(){
+  const u = 1/ppu, small = svg.getBoundingClientRect().width < 560;
+  WORKS.forEach(w => {
+    const g = nodeEls[w.id];
+    const rpx = w.kind==="screen" ? 4.5 : w.ring===0 ? 7.5 : w.ring===1 ? 6 : 5.5;
+    const dot = g.querySelector(".dot");
+    if (w.kind==="screen"){ const s=rpx*u; dot.setAttribute("x",-s); dot.setAttribute("y",-s); dot.setAttribute("width",2*s); dot.setAttribute("height",2*s); }
+    else dot.setAttribute("r", rpx*u);
+    g.querySelector(".hit").setAttribute("r", Math.max(14, small?18:14)*u);
+    g.querySelector(".halo").setAttribute("r", (rpx+5)*u);
+    // label
+    const t = labelEls[w.id];
+    const fpx = w.kind==="screen" ? 11 : w.ring===0 ? 14 : 12.5;
+    t.setAttribute("font-size", fpx*u);
+    const s = Math.sin(w.a*Math.PI/180), c = -Math.cos(w.a*Math.PI/180);
+    const gap = (rpx+6)*u;
+    let anchor = "middle", dx = 0, dy = 0;
+    if (s > 0.28){ anchor="start"; dx=gap; dy=fpx*0.35*u; }
+    else if (s < -0.28){ anchor="end"; dx=-gap; dy=fpx*0.35*u; }
+    else { dy = c<0 ? -gap : gap + fpx*0.8*u; }
+    t.setAttribute("x", w.x+dx); t.setAttribute("y", w.y+dy); t.setAttribute("text-anchor", anchor);
+  });
+  document.querySelectorAll(".ringlbl").forEach(t=> t.style.display = ppu < 0.45 ? "none" : "");
+  gBadges.querySelectorAll("g").forEach(b => {
+    b.querySelector("circle").setAttribute("r", 10*u);
+    b.querySelector("text").setAttribute("font-size", 11*u);
+  });
+  labelVisibility();
+}
+function labelVisibility(){
+  const small = svg.getBoundingClientRect().width < 560;
+  const lit = currentLit();
+  WORKS.forEach(w => {
+    let show;
+    if (lit) show = lit.has(w.id);
+    else if (w.kind==="screen") show = ppu > 0.95;
+    else if (w.ring===0) show = ppu > 0.42;
+    else show = !small || ppu > 0.55;
+    if (S.sel===w.id || S.hover===w.id) show = true;
+    labelEls[w.id].classList.toggle("off", !show);
+  });
+}
+
+/* ---------- HIGHLIGHT ---------- */
+function currentLit(){
+  const id = S.hover || (S.mode==="explore" ? S.sel : null);
+  if (S.hover && S.hover!=="tower"){ const set = new Set([S.hover]); threadsOf(S.hover).forEach(t=>t.m.forEach(m=>set.add(m[0]))); return set; }
+  if (S.mode==="path" && S.path){ const p = PATHS.find(p=>p.id===S.path); return new Set(p.s.map(s=>s[0]).filter(x=>x!=="tower")); }
+  if (S.mode==="threads" && S.thread && !S.hover){ const t = THREADS.find(t=>t.id===S.thread); return new Set(t.m.map(m=>m[0])); }
+  if (id && id!=="tower"){ const set = new Set([id]); threadsOf(id).forEach(t=>t.m.forEach(m=>set.add(m[0]))); return set; }
+  return null;
+}
+function drawThread(t){
+  for (let i=0;i<t.m.length-1;i++){
+    const A=t.m[i], B=t.m[i+1], a=byId[A[0]], b=byId[B[0]];
+    el("path",{d:curve(a,b),stroke:t.color,class:(A[3]||B[3])?"echo":""},gHl);
+  }
+}
+function render(){
+  gHl.innerHTML = ""; gRoute.innerHTML = ""; gBadges.innerHTML = "";
+  const lit = currentLit();
+  svg.classList.toggle("faded", !!lit);
+  gWeb.classList.toggle("dim", !!lit);
+  Object.entries(nodeEls).forEach(([id,g]) => { g.classList.toggle("lit", !!lit && lit.has(id)); g.classList.toggle("sel", S.sel===id); });
+  Object.entries(labelEls).forEach(([id,t]) => t.classList.toggle("lit", !!lit && lit.has(id)));
+  const id = S.hover || (S.mode==="explore" ? S.sel : null);
+  if (S.mode==="path" && S.path && !S.hover){
+    const p = PATHS.find(p=>p.id===S.path);
+    const pts = p.s.map(s=>byId[s[0]]);
+    for (let i=0;i<pts.length-1;i++) el("path",{d:curve(pts[i],pts[i+1],0.7)},gRoute);
+    pts.forEach((w,i) => { if (w.id==="tower") return; const b=el("g",{transform:`translate(${w.x} ${w.y})`},gBadges); el("circle",{r:10},b); const t=el("text",{},b); t.textContent=i+1; });
+  } else if (S.mode==="threads" && S.thread && !S.hover){
+    drawThread(THREADS.find(t=>t.id===S.thread));
+  } else if (id && id!=="tower"){
+    threadsOf(id).forEach(drawThread);
+  }
+  resize();
+}
+
+/* ---------- PANEL ---------- */
+const panel = document.getElementById("panel");
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const spoilBlock = (key, text, label="Spoiler") => {
+  const open = S.spoil || S.revealed.has(key);
+  return `<div class="spoil ${open?"":"locked"}"><span class="lbl">${label}</span><p>${esc(text)}</p>${open?"":`<button data-reveal="${key}" aria-label="Reveal this spoiler"><span>Reveal</span></button>`}</div>`;
+};
+const typeChips = w => {
+  if (w.kind==="screen") return `<span class="chip screen">Screen</span><span class="chip">${w.id==="dtflan"?"In development":w.yr}</span>`;
+  const r = w.ring===0 ? `<span class="chip canon">Tower cycle</span>` : w.echo ? `<span class="chip echo">Echo</span>` : `<span class="chip canon">Canon crossover</span>`;
+  return `${r}<span class="chip">${w.yr}</span>${w.note?`<span class="chip">${esc(w.note)}</span>`:""}`;
+};
+function startPanel(){
+  return `
+  <div class="eyebrow">Where to start</div>
+  <h2>Every road in King's work bends toward one tower.</h2>
+  <div class="facts">
+    <div class="fact"><i class="mark"></i><b>The Tower came first</b><p>King wrote the first line of The Gunslinger in 1970, at 22. Carrie, his first published novel, came out in 1974. The Tower was published later but started first.</p></div>
+    <div class="fact"><i class="mark"></i><b>The web was built backward</b><p>Most links were added over decades. A priest leaves 'Salem's Lot and walks into Wolves of the Calla. An old man from Hearts in Atlantis turns up in the final book.</p></div>
+    <div class="fact"><i class="mark"></i><b>Carrie opened a door</b><p>Flanagan's series (Prime Video, October 2026) plants LaMerk Industries and the Sombra hog farm. In the Tower books both are fronts for the Crimson King.</p></div>
+    <div class="fact"><i class="mark"></i><b>The Tower on screen</b><p>Flanagan has held the rights since 2022. Season one is scripted. As of October 2026, no studio has ordered it.</p></div>
+  </div>
+  <div class="btnrow">
+    <button class="btn" data-go="path">Find my path</button>
+    <button class="btn alt" data-go="threads">Follow a thread</button>
+    <button class="btn alt" data-pick="carrie26">Start at Carrie (2026)</button>
+  </div>
+  <hr class="rule">
+  <p class="muted">Hover or tap any light to see what it connects to. The inner ring is the Tower cycle itself. The middle ring holds books King tied in on the page. The outer ring holds echoes: shared ideas he hasn't confirmed as links.</p>
+  <p class="src">Screen details current to October 14, 2026. Sources: <a href="https://en.wikipedia.org/wiki/Carrie_(miniseries)" target="_blank" rel="noopener">Carrie (miniseries)</a>, <a href="https://www.pajiba.com/tv_reviews/how-does-flanagans-carrie-connect-to-the-dark-tower.php" target="_blank" rel="noopener">Pajiba</a>, <a href="https://booksofbrilliance.com/2026/09/16/the-dark-tower-tv-series-update/" target="_blank" rel="noopener">Books of Brilliance</a>.</p>`;
+}
+function towerPanel(){
+  return `
+  <button class="back" data-home>← Start</button>
+  <div class="eyebrow">The center of everything</div>
+  <h2>The Dark Tower</h2>
+  <p>The linchpin of every world and every time. Six Beams hold it up, crossing at the Tower, each with an animal guardian at either end. Roland Deschain has spent most of his life walking toward it.</p>
+  <div class="tie"><span class="lbl">Our side</span><p>In our world the Tower appears as a single wild rose in a vacant lot at Second Avenue and 46th Street, Manhattan.</p></div>
+  ${spoilBlock("tower-sp","King writes himself into Song of Susannah as the Tower's scribe. The books treat his writing as part of what keeps the Beams standing.")}
+  <div class="btnrow"><button class="btn" data-go="path">Find a route here</button></div>`;
+}
+function workPanel(w){
+  const thr = threadsOf(w.id);
+  const neigh = new Map();
+  thr.forEach(t => { const i = t.m.findIndex(m=>m[0]===w.id); [t.m[i-1],t.m[i+1]].forEach(m=>{ if(m && m[0]!==w.id && !neigh.has(m[0])) neigh.set(m[0],t); }); });
+  const screens = WORKS.filter(s=>s.parent===w.id);
+  const parent = w.parent ? byId[w.parent] : null;
+  return `
+  <button class="back" data-home>← Start</button>
+  <div class="meta">${typeChips(w)}</div>
+  <h2>${esc(w.t)}</h2>
+  <p>${esc(w.b)}</p>
+  ${w.tie?`<div class="tie ${w.echo?"echo":""}"><span class="lbl">${w.echo?"Echo of the Tower":"Tie to the Tower"}</span><p>${esc(w.tie)}</p></div>`:""}
+  ${w.sp?spoilBlock(w.id, w.sp):""}
+  ${parent?`<div><h3>Based on</h3><ul class="list">${itemRow(parent)}</ul></div>`:""}
+  ${screens.length?`<div><h3>On screen</h3><ul class="list">${screens.map(s=>itemRow(s)).join("")}</ul></div>`:""}
+  ${thr.length?`<div><h3>Threads through it</h3><div class="threads" style="margin-top:8px">${thr.map(threadBtn).join("")}</div></div>`:""}
+  ${neigh.size?`<div><h3>Read or watch next</h3><ul class="list">${[...neigh.entries()].map(([id,t])=>itemRow(byId[id], t)).join("")}</ul></div>`:""}`;
+}
+function itemRow(w, t, note, hidden){
+  const sw = t ? `<i class="sw" style="background:${t.color}"></i>` : `<i class="sw" style="background:${w.kind==="screen"?"var(--rose)":w.echo?"transparent;border:1.5px solid var(--dust)":w.ring===0?"var(--rose)":"var(--crimson)"}"></i>`;
+  return `<li><button class="item" data-pick="${w.id}">${sw}<span class="ttl">${esc(w.t)}</span><span class="yr">${w.id==="dtflan"?"dev.":w.yr}</span>${note!==undefined?`<span class="note ${hidden?"hidden":""}">${esc(note)}</span>`:""}</button></li>`;
+}
+function threadBtn(t){
+  const desc = S.spoil && t.ds ? t.ds : t.d;
+  return `<button class="thr" data-thread="${t.id}" aria-pressed="${S.thread===t.id}"><i class="sw" style="background:${t.color}"></i><b>${esc(t.name)}</b><small>${esc(desc)}</small></button>`;
+}
+function threadsPanel(){
+  if (!S.thread) return `
+    <div class="eyebrow">Threads</div>
+    <h2>Pick one thread and follow it.</h2>
+    <p class="muted">Each one is a person, place, power or idea that crosses from book to book. Solid lines are links King made on the page. Dashed lines are echoes.</p>
+    <div class="threads">${THREADS.map(threadBtn).join("")}</div>`;
+  const t = THREADS.find(x=>x.id===S.thread);
+  const desc = S.spoil && t.ds ? t.ds : t.d;
+  return `
+    <button class="back" data-thread-back>← All threads</button>
+    <div class="eyebrow" style="color:${t.color}">Thread · ${t.m.length} works</div>
+    <h2>${esc(t.name)}</h2>
+    <p>${esc(desc)}</p>
+    <ul class="list">${t.m.map(([id,note,sp,echo]) => {
+      const hide = sp && !S.spoil;
+      return itemRow(byId[id], echo?null:t, hide ? "Hidden. Turn on spoilers to see this link." : note + (echo?" (echo)":""), hide);
+    }).join("")}</ul>`;
+}
+function pathPanel(){
+  const chooser = `<div class="origins">${PATHS.map(p=>`<button class="origin" data-path="${p.id}" aria-pressed="${S.path===p.id}">${esc(p.label)}</button>`).join("")}</div>`;
+  if (!S.path) return `
+    <div class="eyebrow">Your path</div>
+    <h2>Where are you coming from?</h2>
+    <p class="muted">Pick what you've read or watched. You get a short route, in order, that ends at the Tower.</p>${chooser}`;
+  const p = PATHS.find(x=>x.id===S.path);
+  return `
+    <div class="eyebrow">Your path</div>
+    <h2>${esc(p.label)}</h2>
+    <ol class="steps">${p.s.map(([id,why],i) => {
+      const w = byId[id];
+      const title = id==="tower" ? "The rest of the Tower" : w.t;
+      const yr = id==="tower" ? "" : `<span class="yr">${id==="dtflan"?"dev.":w.yr}</span>`;
+      return `<li class="step"><span class="n">${id==="tower"?"✦":i+1}</span><button class="st" data-pick="${id}">${esc(title)}${yr}</button><p>${esc(why)}</p></li>`;
+    }).join("")}</ol>
+    <hr class="rule"><h3>Another starting point</h3>${chooser}`;
+}
+function renderPanel(){
+  let html;
+  if (S.mode==="threads") html = threadsPanel();
+  else if (S.mode==="path") html = pathPanel();
+  else if (S.sel==="tower") html = towerPanel();
+  else if (S.sel) html = workPanel(byId[S.sel]);
+  else html = startPanel();
+  panel.innerHTML = html;
+}
+
+/* ---------- ACTIONS ---------- */
+function setMode(m){
+  S.mode = m; S.hover = null;
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.mode===m));
+  if (m!=="explore") S.sel = null;
+  store.set("tower.mode", m);
+  renderPanel(); render(); panel.scrollTop = 0;
+}
+function pick(id){
+  if (S.mode!=="explore"){ S.mode="explore"; document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.mode==="explore")); }
+  S.sel = id; S.hover = null; renderPanel(); render(); panel.scrollTop = 0;
+  if (window.matchMedia("(max-width: 860px)").matches) panel.scrollIntoView({behavior:"smooth", block:"start"});
+}
+panel.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.reveal){ S.revealed.add(b.dataset.reveal); renderPanel(); return; }
+  if (b.dataset.pick){ pick(b.dataset.pick); return; }
+  if (b.dataset.go){ setMode(b.dataset.go); return; }
+  if ("home" in b.dataset){ S.sel=null; renderPanel(); render(); return; }
+  if (b.dataset.thread){ if (S.mode!=="threads"){ S.mode="threads"; document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.mode==="threads")); } S.thread=b.dataset.thread; S.sel=null; renderPanel(); render(); panel.scrollTop=0; return; }
+  if ("threadBack" in b.dataset){ S.thread=null; renderPanel(); render(); return; }
+  if (b.dataset.path){ S.path=b.dataset.path; renderPanel(); render(); panel.scrollTop=0; return; }
+});
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => setMode(t.dataset.mode)));
+const spBtn = document.getElementById("spoilers");
+const syncSpoil = () => spBtn.setAttribute("aria-checked", S.spoil);
+spBtn.addEventListener("click", () => { S.spoil = !S.spoil; store.set("tower.spoil", S.spoil?"1":"0"); syncSpoil(); renderPanel(); });
+syncSpoil();
+
+// Node interaction
+gNodes.addEventListener("pointerover", e => { const g=e.target.closest(".node"); if (!g || e.pointerType!=="mouse" || dragging) return; S.hover=g.dataset.id; render(); });
+gNodes.addEventListener("pointerout", e => { const g=e.target.closest(".node"); if (!g || e.pointerType!=="mouse") return; if (S.hover){ S.hover=null; render(); } });
+gNodes.addEventListener("click", e => { if (moved) return; const g=e.target.closest(".node"); if (g) pick(g.dataset.id); });
+gNodes.addEventListener("keydown", e => { if ((e.key==="Enter"||e.key===" ") && e.target.closest(".node")){ e.preventDefault(); pick(e.target.closest(".node").dataset.id); } });
+gTower.addEventListener("click", () => { if (!moved) pick("tower"); });
+gTower.addEventListener("keydown", e => { if (e.key==="Enter"||e.key===" "){ e.preventDefault(); pick("tower"); } });
+
+/* ---------- ZOOM + PAN ---------- */
+function toSvg(cx, cy){ const r=svg.getBoundingClientRect(); const sx=r.width/vb.w, sy=r.height/vb.h, s=Math.min(sx,sy); const ox=(r.width - vb.w*s)/2, oy=(r.height - vb.h*s)/2; return {x: vb.x + (cx - r.left - ox)/s, y: vb.y + (cy - r.top - oy)/s}; }
+function zoomAt(f, cx, cy){
+  const nw = Math.min(BASE.w, Math.max(BASE.w/6, vb.w*f)); const k = nw/vb.w; if (k===1) return;
+  const p = cx==null ? {x:vb.x+vb.w/2, y:vb.y+vb.h/2} : toSvg(cx,cy);
+  vb = {x: p.x - (p.x-vb.x)*k, y: p.y - (p.y-vb.y)*k, w: nw, h: vb.h*k};
+  clamp(); applyVB();
+}
+function clamp(){
+  if (vb.w >= BASE.w - 0.5){ vb={...BASE}; return; }
+  vb.x = Math.min(BASE.x+BASE.w-vb.w, Math.max(BASE.x, vb.x));
+  vb.y = Math.min(BASE.y+BASE.h-vb.h, Math.max(BASE.y, vb.y));
+}
+svg.addEventListener("wheel", e => { e.preventDefault(); zoomAt(Math.exp(e.deltaY*0.0015), e.clientX, e.clientY); }, {passive:false});
+document.getElementById("zin").onclick = () => zoomAt(0.7);
+document.getElementById("zout").onclick = () => zoomAt(1/0.7);
+document.getElementById("zreset").onclick = () => { vb={...BASE}; applyVB(); };
+const ptrs = new Map(); let dragging=false, moved=false, last=null, pinch0=null;
+svg.addEventListener("pointerdown", e => {
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY}); moved=false;
+  if (ptrs.size===1){ last={x:e.clientX,y:e.clientY}; }
+  if (ptrs.size===2){ const [a,b]=[...ptrs.values()]; pinch0={d:Math.hypot(a.x-b.x,a.y-b.y), w:vb.w}; }
+});
+svg.addEventListener("pointermove", e => {
+  if (!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if (ptrs.size===2 && pinch0){ const [a,b]=[...ptrs.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); const target=pinch0.w*pinch0.d/d; zoomAt(target/vb.w,(a.x+b.x)/2,(a.y+b.y)/2); moved=true; return; }
+  if (ptrs.size===1 && last && vb.w < BASE.w-1){
+    const dx=e.clientX-last.x, dy=e.clientY-last.y;
+    if (!dragging && Math.hypot(dx,dy)<4) return;
+    if (!dragging){ dragging=true; svg.classList.add("dragging"); try{svg.setPointerCapture(e.pointerId);}catch(_){} }
+    moved=true; vb.x -= dx/ppu; vb.y -= dy/ppu; last={x:e.clientX,y:e.clientY}; clamp(); applyVB();
+  }
+});
+const endPtr = e => { ptrs.delete(e.pointerId); if (ptrs.size<2) pinch0=null; if (!ptrs.size){ dragging=false; svg.classList.remove("dragging"); last=null; setTimeout(()=>moved=false,0); } };
+svg.addEventListener("pointerup", endPtr); svg.addEventListener("pointercancel", endPtr);
+new ResizeObserver(() => { measure(); resize(); }).observe(svg);
+
+/* ---------- INTRO ---------- */
+function playIntro(){
+  const top = document.getElementById("top");
+  svg.classList.remove("intro"); top.classList.remove("introtext");
+  void svg.getBoundingClientRect();
+  svg.classList.add("intro"); top.classList.add("introtext");
+  clearTimeout(introTimer);
+  introTimer = setTimeout(() => svg.classList.remove("intro"), 5600);
+}
+let introTimer = setTimeout(() => svg.classList.remove("intro"), 5600);
+document.getElementById("replay").onclick = () => { vb={...BASE}; applyVB(); playIntro(); };
+
+/* ---------- BOOT ---------- */
+const startMode = store.get("tower.mode");
+if (startMode && ["explore","threads","path"].includes(startMode) && startMode!=="explore") setMode(startMode);
+applyVB(); renderPanel(); render();
+})();
+</script>
+
+</body>
+</html>
