@@ -157,7 +157,7 @@ h1 em{color:var(--crimson);font-style:italic}
 .ring.r0{stroke:#5b1e2a}
 .ringlbl{fill:#7c5f5f;font-family:var(--f-mono);letter-spacing:.18em}
 .beam{stroke:url(#beamGrad);stroke-width:1.2;vector-effect:non-scaling-stroke}
-.web path{fill:none;stroke-width:1;vector-effect:non-scaling-stroke;opacity:.16;transition:opacity .25s}
+.web path{fill:none;stroke-width:1;vector-effect:non-scaling-stroke;opacity:.11;transition:opacity .25s}
 .web.dim path{opacity:.04}
 .hl path{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linecap:round}
 .hl path.echo{stroke-dasharray:5 5}
@@ -178,6 +178,8 @@ h1 em{color:var(--crimson);font-style:italic}
 .lbl.screen{fill:var(--rose);font-style:italic}
 .lbl.off{opacity:0}
 .faded .node:not(.lit){opacity:.18}
+svg:not(.faded) .node.echo,svg:not(.faded) .node.screen{opacity:.45}
+svg:not(.faded) .lbl.r2{fill:var(--dust)}
 .faded .lbl:not(.lit){opacity:0}
 .badge circle{fill:var(--crimson)}
 .badge text{fill:#fff;font-family:var(--f-mono);text-anchor:middle;dominant-baseline:central;pointer-events:none}
@@ -231,9 +233,9 @@ h1 em{color:var(--crimson);font-style:italic}
     <h1>Atlas of the <em>Dark Tower</em></h1>
   </div>
   <div class="tabs" role="tablist" aria-label="Ways in">
-    <button class="tab" role="tab" id="tab-explore" data-mode="explore" aria-selected="true">Explore</button>
+    <button class="tab" role="tab" id="tab-path" data-mode="path" aria-selected="true">Your path</button>
     <button class="tab" role="tab" id="tab-threads" data-mode="threads" aria-selected="false">Threads</button>
-    <button class="tab" role="tab" id="tab-path" data-mode="path" aria-selected="false">Your path</button>
+    <button class="tab" role="tab" id="tab-explore" data-mode="explore" aria-selected="false">Explore</button>
   </div>
   <div class="tools">
     <button class="switch" id="spoilers" role="switch" aria-checked="false"><span class="knob" aria-hidden="true"></span>Spoilers</button>
@@ -580,7 +582,7 @@ const store = {
   get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
   set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
 };
-const S = { mode:"explore", sel:null, thread:null, path:null, spoil: store.get("tower.spoil")==="1", revealed:new Set(), hover:null };
+const S = { mode:"path", sel:null, thread:null, path:null, spoil: store.get("tower.spoil")==="1", revealed:new Set(), hover:null };
 
 /* ---------- SVG BUILD ---------- */
 const NS = "http://www.w3.org/2000/svg";
@@ -642,7 +644,7 @@ order.forEach((w,i) => {
   else el("circle",{class:"dot",r:6},g);
   el("circle",{class:"hit",r:14},g);
   g.dataset.id = w.id; nodeEls[w.id] = g;
-  const lbl = el("text",{class:`lbl ${w.ring===0&&w.kind!=="screen"?"r0":""} ${w.kind==="screen"?"screen":""}`,style:`--d:${(delay+0.15).toFixed(2)}s`},gLabels);
+  const lbl = el("text",{class:`lbl ${w.ring===0&&w.kind!=="screen"?"r0":""} ${w.ring===2&&w.kind!=="screen"?"r2":""} ${w.kind==="screen"?"screen":""}`,style:`--d:${(delay+0.15).toFixed(2)}s`},gLabels);
   lbl.textContent = w.t; labelEls[w.id] = lbl;
 });
 
@@ -701,12 +703,29 @@ function labelVisibility(){
 }
 
 /* ---------- HIGHLIGHT ---------- */
+// Direct links for one work: every other member of its threads (echo members only if the work is itself an echo), plus its own screen versions or source book.
+function linksOf(id){
+  const w = byId[id], self = w.echo || (w.parent && byId[w.parent].echo);
+  const out = new Map();
+  threadsOf(id).forEach(t => {
+    const me = t.m.find(m=>m[0]===id);
+    t.m.forEach(m => {
+      if (m[0]===id || out.has(m[0])) return;
+      const echo = !!(m[3] || me[3]);
+      if (echo && !self && m[3]) return;
+      out.set(m[0], {color:t.color, echo});
+    });
+  });
+  WORKS.forEach(x => { if (x.parent===id && !out.has(x.id)) out.set(x.id,{color:"var(--rose)",echo:false}); });
+  if (w.parent && !out.has(w.parent)) out.set(w.parent,{color:"var(--rose)",echo:false});
+  return out;
+}
 function currentLit(){
   const id = S.hover || (S.mode==="explore" ? S.sel : null);
-  if (S.hover && S.hover!=="tower"){ const set = new Set([S.hover]); threadsOf(S.hover).forEach(t=>t.m.forEach(m=>set.add(m[0]))); return set; }
+  if (S.hover && S.hover!=="tower"){ return new Set([S.hover, ...linksOf(S.hover).keys()]); }
   if (S.mode==="path" && S.path){ const p = PATHS.find(p=>p.id===S.path); return new Set(p.s.map(s=>s[0]).filter(x=>x!=="tower")); }
   if (S.mode==="threads" && S.thread && !S.hover){ const t = THREADS.find(t=>t.id===S.thread); return new Set(t.m.map(m=>m[0])); }
-  if (id && id!=="tower"){ const set = new Set([id]); threadsOf(id).forEach(t=>t.m.forEach(m=>set.add(m[0]))); return set; }
+  if (id && id!=="tower"){ return new Set([id, ...linksOf(id).keys()]); }
   return null;
 }
 function drawThread(t){
@@ -731,7 +750,8 @@ function render(){
   } else if (S.mode==="threads" && S.thread && !S.hover){
     drawThread(THREADS.find(t=>t.id===S.thread));
   } else if (id && id!=="tower"){
-    threadsOf(id).forEach(drawThread);
+    const a = byId[id];
+    linksOf(id).forEach((v,oid) => el("path",{d:curve(a,byId[oid]),stroke:v.color,class:v.echo?"echo":""},gHl));
   }
   resize();
 }
@@ -826,7 +846,10 @@ function pathPanel(){
   if (!S.path) return `
     <div class="eyebrow">Your path</div>
     <h2>Where are you coming from?</h2>
-    <p class="muted">Pick what you've read or watched. You get a short route, in order, that ends at the Tower.</p>${chooser}`;
+    <p class="muted">Tap the one closest to you. The map lights up a short route, in order, that ends at the Dark Tower.</p>${chooser}
+    <hr class="rule">
+    <p class="muted">Every light on the map is a Stephen King book or adaptation. The closer it sits to the Tower in the middle, the more it matters to the story.</p>
+    <div class="btnrow"><button class="btn alt" data-go="explore">Why the Tower? Explore the map</button><button class="btn alt" data-go="threads">Follow a character or place</button></div>`;
   const p = PATHS.find(x=>x.id===S.path);
   return `
     <div class="eyebrow">Your path</div>
@@ -937,7 +960,7 @@ document.getElementById("replay").onclick = () => { vb={...BASE}; applyVB(); pla
 
 /* ---------- BOOT ---------- */
 const startMode = store.get("tower.mode");
-if (startMode && ["explore","threads","path"].includes(startMode) && startMode!=="explore") setMode(startMode);
+if (startMode && ["explore","threads","path"].includes(startMode) && startMode!=="path") setMode(startMode);
 applyVB(); renderPanel(); render();
 })();
 </script>
